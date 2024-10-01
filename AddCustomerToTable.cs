@@ -19,7 +19,7 @@ public class AddCustomerToTable
         _tableServiceClient = new TableServiceClient(Environment.GetEnvironmentVariable("AzureWebJobsStorage"));
     }
 
-    [Function("AddCustomerToTable")]//temp bhjdbjhdshbuhfjhdf
+    [Function("AddCustomerToTable")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
     {
         _logger.LogInformation("Processing customer data for Table Storage.");
@@ -29,6 +29,7 @@ public class AddCustomerToTable
 
         if (string.IsNullOrEmpty(customer?.Name) || string.IsNullOrEmpty(customer?.Email))
         {
+            _logger.LogError("Invalid customer data.");
             return new BadRequestObjectResult("Invalid customer data.");
         }
 
@@ -38,9 +39,22 @@ public class AddCustomerToTable
         customer.PartitionKey = "1";
         customer.RowKey = Guid.NewGuid().ToString();
 
-        await tableClient.AddEntityAsync(customer);
+        _logger.LogInformation($"Adding customer to table: Name={customer.Name}, Email={customer.Email}");
+
+        try
+        {
+            await tableClient.AddEntityAsync(customer);
+            _logger.LogInformation("Customer added to table successfully.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error adding customer to table: {ex.Message}");
+            return new StatusCodeResult(500); 
+        }
+
         return new OkObjectResult($"Customer {customer.Name} added successfully.");
     }
+
 }
 
 public class CustomerEntity : ITableEntity

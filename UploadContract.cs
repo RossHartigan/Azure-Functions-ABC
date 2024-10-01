@@ -22,8 +22,8 @@ public class UploadContract
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
     {
         _logger.LogInformation("Uploading contract file to Azure File Share.");
+        var file = req.Form.Files["File"];
 
-        var file = req.Form.Files["contract"];
         if (file == null || file.Length == 0)
         {
             return new BadRequestObjectResult("No file uploaded.");
