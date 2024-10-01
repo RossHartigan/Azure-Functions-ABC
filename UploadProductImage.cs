@@ -6,7 +6,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Azure.Storage.Blobs;
 
-public class UploadProductImage//testing
+public class UploadProductImage
 {
     private readonly ILogger<UploadProductImage> _logger;
     private readonly BlobServiceClient _blobServiceClient;
